@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.models import Task
 from app.database import SessionLocal, Base, engine
+from app.schemas import TaskCreate
 
 
 # Crear la tabla si no existe
@@ -19,10 +20,11 @@ def get_db():
         db.close()
 
 
+
 # Ruta para agregar una tarea
 @router.post("/tasks/")
-def create_task(title:str, description:str = None, db: Session = Depends(get_db)):
-    db_task = Task(title=title, description = description)
+def create_task(task: TaskCreate, db: Session = Depends(get_db)):  # Usa TaskCreate
+    db_task = Task(title=task.title, description=task.description)
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
